@@ -30,6 +30,7 @@ namespace INFOIBV
             this.WindowState = FormWindowState.Maximized;
         }
 
+        //Load image
         private void LoadImageButton_Click(object sender, EventArgs e)
         {
             if (openImageDialog.ShowDialog() == DialogResult.OK)             // Open File Dialog
@@ -46,6 +47,9 @@ namespace INFOIBV
             }
         }
 
+
+
+        //Do something with the image
         private void applyButton_Click(object sender, EventArgs e)
         {
             if (InputImage == null) return;                                 // Get out if no input image
@@ -168,6 +172,15 @@ namespace INFOIBV
             progressBar.Visible = false;                                    // Hide progress bar
         }
 
+
+
+
+
+        // \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ --- OUR FUNCTIONS --- \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ \\
+
+
+
+        // \/\/\/\/  FUNCTION THAT ARE NOT REALLY WORKING AND NEED TO BE FIXED (FROM P3)  \/\/\/\/
         private void getHoughTransform(int[,] img, float[,] houghImage)
         {
             for (int y = 0; y < OutputHeight - 1; y++)
@@ -180,6 +193,7 @@ namespace INFOIBV
             }
         }
 
+        //Or actually display hough values in an image
         private void houghValues(int x, int y, float[,] houghImage, int[,] img)
         {
             maxAngle = (float)((int.Parse(houghAngleMaxValue.Text) + 1) * Math.PI / 180f);
@@ -199,6 +213,7 @@ namespace INFOIBV
             }
         }
 
+        //LineDetection Tim
         private List<int[]> LineDetection(int[,] img, int r, int o, int minThreshold, int minLength, int maxGap)
         {
             List<int[]> output = new List<int[]>();
@@ -246,7 +261,7 @@ namespace INFOIBV
                     }
                 }
             }
-            /// check if 2 lines should be one using maxgap
+            // check if 2 lines should be one using maxgap
             for (int i = 0; i < output.Count() - 1; i++)
             {
                 int[] line1 = output[i];
@@ -262,6 +277,7 @@ namespace INFOIBV
             return output;
         }
 
+        //Option B. Basically thresholding hough image
         private float[,] NonMaxSuppression(float[,] houghImage)
         {
             for (int x = 0; x < houghSize - 1; x++)
@@ -291,7 +307,6 @@ namespace INFOIBV
             }
             return houghImage;
         }
-
 
         // returns (theta, r) pairs, stored in a 2d array
         private int[,] Accumulator(int[,] img, int threshold)
@@ -338,8 +353,8 @@ namespace INFOIBV
             return acc;
         }
 
-        /*
-        private List<int[]> lineDetection(int[,] img, float[,] houghImage)
+        //LineDetection Timo (NOT IN USE)
+        private List<int[]> lineDetection2(int[,] img, float[,] houghImage)
         {
             List<int[]> lines = new List<int[]>();
             for (int r = 0; r < houghImage.GetLength(1) - 1; r++)
@@ -369,8 +384,153 @@ namespace INFOIBV
                 }
             }
             return lines;
-        }*/
+        }
 
+
+
+
+
+        // \/\/\/\/  USEFUL FILTER FUNCTIONS WE DONT NEED TO TOUCH (PROBABLY)  \/\/\/\/
+        private int[,] complement(int[,] img)
+        {
+            for (int x = 0; x < InputImage.Size.Width; x++)
+            {
+                for (int y = 0; y < InputImage.Size.Height; y++)
+                {
+                    int pixelColor = img[x, y];
+                    img[x, y] = 255 - pixelColor;
+                }
+            }
+            return img;
+        }
+
+        private int[,] applyKernel(int[,] img, float[,] kernel)
+        {
+            int[,] ImageWithkernel = new int[InputImage.Size.Width, InputImage.Size.Height];
+            int size = ((int)Math.Sqrt(kernel.Length) - 1) / 2;
+            for (int x = 0; x < InputImage.Size.Width; x++)
+            {
+                for (int y = 0; y < InputImage.Size.Height; y++)
+                {
+                    float value = 0;
+                    if (x + size >= InputImage.Size.Width || x - size < 0 || y + size >= InputImage.Size.Height || y - size < 0)
+                        continue;
+                    for (int n = -size; n <= size; n++)
+                    {
+                        for (int m = -size; m <= size; m++)
+                        {
+                            value += kernel[n + size, m + size] * img[x + n, y + m];
+                        }
+                    }
+                    ImageWithkernel[x, y] = (int)value;
+                }
+            }
+            return ImageWithkernel;
+        }
+
+        private int[,] fullRangeContrastImage(int[,] img)
+        {
+            int[,] ImageWithkernel = new int[InputImage.Size.Width, InputImage.Size.Height];
+            float min = 255;
+            float max = 0;
+            for (int x = 0; x < InputImage.Size.Width; x++)
+            {
+                for (int y = 0; y < InputImage.Size.Height; y++)
+                {
+                    if (img[x, y] < min)
+                        min = img[x, y];
+                    if (img[x, y] > max)
+                        max = img[x, y];
+                }
+            }
+
+            for (int x = 0; x < InputImage.Size.Width; x++)
+            {
+                for (int y = 0; y < InputImage.Size.Height; y++)
+                {
+                    ImageWithkernel[x, y] = (int)((img[x, y] - min) / (max - min) * 255);
+                }
+            }
+
+            return ImageWithkernel;
+        }
+
+        private int[,] edgeDetection(int[,] grayscaleImage)
+        {
+            int[,] returnImg = new int[InputImage.Size.Width, InputImage.Size.Height];
+            int[,] ImageX = applyKernel(grayscaleImage, createEdgeKernel(true));
+            int[,] ImageY = applyKernel(grayscaleImage, createEdgeKernel(false));
+            for (int i = 0; i < OutputWidth; i++)
+            {
+                for (int j = 0; j < OutputHeight; j++)
+                {
+                    //Debug.WriteLine(ImageX[i, j]);
+                    int color = (int)Math.Sqrt(Math.Pow(ImageX[i, j], 2) + Math.Pow(ImageY[i, j], 2));
+                    returnImg[i, j] = color;
+                }
+            }
+            return returnImg;
+        }
+
+        private float[,] createEdgeKernel(bool x = true)
+        {
+            float[,] kernel = new float[,] { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
+            if (!x)
+            {
+                kernel = new float[,] { { -1, -2, -1 }, { 0, 0, 0 }, { 1, 2, 1 } };
+            }
+            return kernel;
+        }
+
+        private void BiggestShape_CheckedChanged(object sender, EventArgs e)
+        {
+            if (BiggestShape.Checked)
+                BoundaryTrace.Checked = true;
+        }
+
+        private void FullShapes_CheckedChanged(object sender, EventArgs e)
+        {
+            if (FullShapes.Checked)
+                BoundaryTrace.Checked = true;
+        }
+
+        private void saveButton_Click(object sender, EventArgs e)
+        {
+            if (OutputImage == null) return;                                // Get out if no output image
+            if (saveImageDialog.ShowDialog() == DialogResult.OK)
+                OutputImage.Save(saveImageDialog.FileName);                 // Save the output image
+        }
+
+        private void houghTransformCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+        }
+
+        private int toGrayscale(Color pixelColor)
+        {
+            int grayscale = (int)((pixelColor.R * 0.3f) + (pixelColor.G * 0.59f) + (pixelColor.B * 0.11f));
+            return grayscale;
+        }
+        
+
+
+
+
+        // \/\/\/\/  SOME EASY USEFUL MATH FUNCTIONS  \/\/\/\/
+        private double toRadian(int o)
+        {
+            return o * Math.PI / 180;
+        }
+
+        private int truncate(int value)
+        {
+            return Math.Max(Math.Min(value, 255), 0);
+        }
+
+
+
+
+
+        // \/\/\/\/  THINGS WE MOST CERTAINLY PROBABLY DONT NEED I THINK  \/\/\/\/
         private void getBoundary(int[,] img)
         {
             List<int> shapeSizeList = new List<int>();
@@ -488,11 +648,6 @@ namespace INFOIBV
                     }
                 }
             }
-        }
-
-        private double toRadian(int o)
-        {
-            return o * Math.PI / 180;
         }
 
         private bool traceContour(int[,] labelImg, int label, bool sizeCount, List<int> shapeSize, List<List<int[]>> shapeBoundaries)
@@ -664,131 +819,6 @@ namespace INFOIBV
                     }
                 }
             }
-        }
-
-        private void houghTransformCheckbox_CheckedChanged(object sender, EventArgs e)
-        {
-        }
-
-        private int[,] complement(int[,] img)
-        {
-            for (int x = 0; x < InputImage.Size.Width; x++)
-            {
-                for (int y = 0; y < InputImage.Size.Height; y++)
-                {
-                    int pixelColor = img[x, y];
-                    img[x, y] = 255 - pixelColor;
-                }
-            }
-            return img;
-        }
-
-        private int truncate(int value)
-        {
-            return Math.Max(Math.Min(value, 255), 0);
-        }
-
-        private int toGrayscale(Color pixelColor)
-        {
-            int grayscale = (int)((pixelColor.R * 0.3f) + (pixelColor.G * 0.59f) + (pixelColor.B * 0.11f));
-            return grayscale;
-        }
-
-        private void saveButton_Click(object sender, EventArgs e)
-        {
-            if (OutputImage == null) return;                                // Get out if no output image
-            if (saveImageDialog.ShowDialog() == DialogResult.OK)
-                OutputImage.Save(saveImageDialog.FileName);                 // Save the output image
-        }
-
-        private void BiggestShape_CheckedChanged(object sender, EventArgs e)
-        {
-            if (BiggestShape.Checked)
-                BoundaryTrace.Checked = true;
-        }
-
-        private void FullShapes_CheckedChanged(object sender, EventArgs e)
-        {
-            if (FullShapes.Checked)
-                BoundaryTrace.Checked = true;
-        }
-
-        private int[,] applyKernel(int[,] img, float[,] kernel)
-        {
-            int[,] ImageWithkernel = new int[InputImage.Size.Width, InputImage.Size.Height];
-            int size = ((int)Math.Sqrt(kernel.Length) - 1) / 2;
-            for (int x = 0; x < InputImage.Size.Width; x++)
-            {
-                for (int y = 0; y < InputImage.Size.Height; y++)
-                {
-                    float value = 0;
-                    if (x + size >= InputImage.Size.Width || x - size < 0 || y + size >= InputImage.Size.Height || y - size < 0)
-                        continue;
-                    for (int n = -size; n <= size; n++)
-                    {
-                        for (int m = -size; m <= size; m++)
-                        {
-                            value += kernel[n + size, m + size] * img[x + n, y + m];
-                        }
-                    }
-                    ImageWithkernel[x, y] = (int)value;
-                }
-            }
-            return ImageWithkernel;
-        }
-
-        private int[,] fullRangeContrastImage(int[,] img)
-        {
-            int[,] ImageWithkernel = new int[InputImage.Size.Width, InputImage.Size.Height];
-            float min = 255;
-            float max = 0;
-            for (int x = 0; x < InputImage.Size.Width; x++)
-            {
-                for (int y = 0; y < InputImage.Size.Height; y++)
-                {
-                    if (img[x, y] < min)
-                        min = img[x, y];
-                    if (img[x, y] > max)
-                        max = img[x, y];
-                }
-            }
-
-            for (int x = 0; x < InputImage.Size.Width; x++)
-            {
-                for (int y = 0; y < InputImage.Size.Height; y++)
-                {
-                    ImageWithkernel[x, y] = (int)((img[x, y] - min) / (max - min) * 255);
-                }
-            }
-
-            return ImageWithkernel;
-        }
-
-        private int[,] edgeDetection(int[,] grayscaleImage)
-        {
-            int[,] returnImg = new int[InputImage.Size.Width, InputImage.Size.Height];
-            int[,] ImageX = applyKernel(grayscaleImage, createEdgeKernel(true));
-            int[,] ImageY = applyKernel(grayscaleImage, createEdgeKernel(false));
-            for (int i = 0; i < OutputWidth; i++)
-            {
-                for (int j = 0; j < OutputHeight; j++)
-                {
-                    //Debug.WriteLine(ImageX[i, j]);
-                    int color = (int)Math.Sqrt(Math.Pow(ImageX[i, j], 2) + Math.Pow(ImageY[i, j], 2));
-                    returnImg[i, j] = color;
-                }
-            }
-            return returnImg;
-        }
-
-        private float[,] createEdgeKernel(bool x = true)
-        {
-            float[,] kernel = new float[,] { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
-            if (!x)
-            {
-                kernel = new float[,] { { -1, -2, -1 }, { 0, 0, 0 }, { 1, 2, 1 } };
-            }
-            return kernel;
         }
     }
 }
