@@ -131,33 +131,33 @@ namespace INFOIBV
             if (lineDetectionCheckbox.Checked)
             {
                 float[,] acc = Accumulator(grayscaleImage, int.Parse(houghThresholdVal.Text));
-                int rmax = (int)Math.Sqrt(Math.Pow(OutputHeight, 2) + Math.Pow(OutputWidth, 2));
-                for (int x = 0; x < 180; x++)
+                /*for (int x = 0; x < 180; x++)
                 {
-                    for (int y = 0; y < rmax; y++)
+                    for (int y = 0; y < houghSize; y++)
                     {
                         houghImage[x, y] = acc[x, y];
                     }
                 }
                 for (int i = 0; i < 180; i++)
                 {
-                    for (int j = 0; j < rmax; j++)
+                    for (int j = 0; j < houghSize; j++)
                     {
                         int val = truncate((int)houghImage[i, j]);
                         Color color = Color.FromArgb(val, val, val);
                         houghImageBitmap.SetPixel(i, j, color);
                     }
                 }
-                houghImageOutput.Image = houghImageBitmap;
+                houghImageOutput.Image = houghImageBitmap;*/
 
+                int rmax = (int)Math.Sqrt(Math.Pow(OutputHeight, 2) + Math.Pow(OutputWidth, 2));
                 for (int o = 0; o < 181; o++)
                 {
                     //Debug.WriteLine(o);
-                    for (int r = 0; r < rmax; r++)
+                    for (int r = 0; r < rmax*2; r++)
                     {
                         if (acc[o, r] == 255)
                         {
-                            List<int[]> lines = LineDetection2(grayscaleImage, r, toRadian(o), int.Parse(minIntensityThresVal.Text), int.Parse(minLengthParVal.Text), int.Parse(maxGapParVal.Text));
+                            List<int[]> lines = LineDetection2(grayscaleImage, r-rmax, toRadian(o), int.Parse(minIntensityThresVal.Text), int.Parse(minLengthParVal.Text), int.Parse(maxGapParVal.Text));
                             
                             
                             /*for (int i = 0; i < lines.Count(); i++)
@@ -312,24 +312,23 @@ namespace INFOIBV
         //LineDetection Tim
         private List<int[]> LineDetection2(int[,] img, int r, double o, int minThreshold, int minLength, int maxGap)
         {
-            List<int[,]> linestartend = new List<int[,]>();
-            //Debug.WriteLine("loop");
-            int posX = (int)Math.Sin(o) * r;
-            int posY = (int)Math.Cos(o) * r;
-            img[posX, posY] = 255;
-            int dx = (int)Math.Cos(o);
-            int dy = (int)Math.Sin(o);
-            //Debug.WriteLine(o + " " + r + " " + posX + " " + posY + " " + dx + " " + dy);
-            Debug.WriteLine(Math.Cos(o) + " " + posX / Math.Cos(o));
-            //Debug.WriteLine("loop " + s + " " + s2);
+            int posX = (int)(Math.Sin(o) * r);
+            int posY = (int)(Math.Cos(o) * r);
+            //o = (o + toRadian(90))%toRadian(180);
+            double dx = Math.Cos(o);
+            double dy = Math.Sin(o);
+            Debug.WriteLine(toDegree(o) + " " + o + " " + r + " " + posX + " " + posY + " " + dx + " " + dy);
+            //Debug.WriteLine(Math.Cos(o) + " " + posX / Math.Cos(o));
             int rmax = (int)Math.Sqrt(Math.Pow(OutputHeight, 2) + Math.Pow(OutputWidth, 2));
             for (int i = -rmax; i < rmax; i++)
             {
-                int x = posX + dx * i;
-                int y = posY + dy * i;
+                int x = (int)(posX + dx * i);
+                int y = (int)(posY + dy * i);
                 if (x >= 0 && y >= 0 && x < OutputWidth && y < OutputHeight)
+                {
                     img[x, y] = 255;
-                //Debug.WriteLine(posX + dx * i + " " + posY + dy * i);
+                    //Debug.WriteLine(posX + dx * i + " " + posY + dy * i);
+                }
             }
             return null;
         }
@@ -369,7 +368,7 @@ namespace INFOIBV
         private float[,] Accumulator(int[,] img, int threshold)
         {
             int rmax = (int)Math.Sqrt(Math.Pow(OutputHeight, 2) + Math.Pow(OutputWidth, 2));
-            float[,] acc = new float[180 + 1, rmax + 1];
+            float[,] acc = new float[180 + 1, rmax*2 + 1];
 
             for (int x = 0; x < InputImage.Size.Width; x++)
             {
@@ -379,9 +378,9 @@ namespace INFOIBV
                     {
                         for (int o = 0; o <= 180; o++)
                         {
-                            float r = Math.Abs((int)(x * Math.Cos(toRadian(o)) + y * Math.Sin(toRadian(o))));
+                            double r = x * Math.Cos(toRadian(o)) + y * Math.Sin(toRadian(o));
                             //Debug.WriteLine(r);
-                            acc[o, (int)r] += 0.3f;
+                            acc[o, (int)(r+rmax)] += 1;
                         }
                     }
                 }
@@ -389,13 +388,13 @@ namespace INFOIBV
             // non-maximum suppression
             for (int x = 0; x < 180; x++)
             {
-                for (int y = 0; y < rmax; y++)
+                for (int y = 0; y < rmax*2; y++)
                 {
                     float value = acc[x, y];
-                    float up = acc[Math.Max(Math.Min(180, x), 0), Math.Max(Math.Min(rmax, (y + 1)), 0)];
-                    float right = acc[Math.Max(Math.Min(180, (x + 1)), 0), Math.Max(Math.Min(rmax, y), 0)];
-                    float down = acc[Math.Max(Math.Min(180, (x)), 0), Math.Max(Math.Min(rmax, (y - 1)), 0)];
-                    float left = acc[Math.Max(Math.Min(180, (x - 1)), 0), Math.Max(Math.Min(rmax, y), 0)];
+                    float up = acc[Math.Max(Math.Min(180, x), 0), Math.Max(Math.Min(rmax*2, (y + 1)), 0)];
+                    float right = acc[Math.Max(Math.Min(180, (x + 1)), 0), Math.Max(Math.Min(rmax*2, y), 0)];
+                    float down = acc[Math.Max(Math.Min(180, (x)), 0), Math.Max(Math.Min(rmax*2, (y - 1)), 0)];
+                    float left = acc[Math.Max(Math.Min(180, (x - 1)), 0), Math.Max(Math.Min(rmax*2, y), 0)];
                     if (up > value || down > value || right > value || left > value)
                     {
                         value = 0;
@@ -577,12 +576,12 @@ namespace INFOIBV
 
 
         // \/\/\/\/  SOME EASY USEFUL MATH FUNCTIONS  \/\/\/\/
-        private double toRadian(int o)
+        private double toRadian(double o)
         {
             return o * Math.PI / 180;
         }
 
-        private double toDegree(int o)
+        private double toDegree(double o)
         {
             return o * 180/ Math.PI;
         }
