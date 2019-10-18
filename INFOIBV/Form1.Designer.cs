@@ -247,7 +247,7 @@ namespace INFOIBV
             this.minIntensityThresVal.Name = "minIntensityThresVal";
             this.minIntensityThresVal.Size = new System.Drawing.Size(100, 22);
             this.minIntensityThresVal.TabIndex = 28;
-            this.minIntensityThresVal.Text = "min intensity threshold";
+            this.minIntensityThresVal.Text = "100";
             // 
             // minLengthParVal
             // 
@@ -255,7 +255,7 @@ namespace INFOIBV
             this.minLengthParVal.Name = "minLengthParVal";
             this.minLengthParVal.Size = new System.Drawing.Size(100, 22);
             this.minLengthParVal.TabIndex = 29;
-            this.minLengthParVal.Text = "min length parameter";
+            this.minLengthParVal.Text = "1";
             // 
             // maxGapParVal
             // 
@@ -263,7 +263,7 @@ namespace INFOIBV
             this.maxGapParVal.Name = "maxGapParVal";
             this.maxGapParVal.Size = new System.Drawing.Size(100, 22);
             this.maxGapParVal.TabIndex = 30;
-            this.maxGapParVal.Text = "max gap parameter";
+            this.maxGapParVal.Text = "1";
             // 
             // lineDetectionCheckbox
             // 
