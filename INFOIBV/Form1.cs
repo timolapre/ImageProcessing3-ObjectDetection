@@ -17,12 +17,13 @@ namespace INFOIBV
         private Bitmap OutputImage;
         private Bitmap houghImageBitmap;
         private int OutputWidth, OutputHeight;
+        float[,] houghImage;
 
         private int startX = -1, startY = -1, firstX = -1, firstY = -1;
         private int boundaryX, boundaryY, boundaryDirection;
 
         private int houghSize = 500;
-        int maxAngle, minAngle, a, b;
+        int maxAngle, minAngle;
 
         public INFOIBV()
         {
@@ -56,9 +57,7 @@ namespace INFOIBV
             if (OutputImage != null) OutputImage.Dispose();                 // Reset output image
             OutputImage = new Bitmap(InputImage.Size.Width, InputImage.Size.Height); // Create new output image
             if (houghImageBitmap != null) houghImageBitmap.Dispose();
-            houghImageBitmap = new Bitmap(houghSize, houghSize);
             Color[,] Image = new Color[InputImage.Size.Width, InputImage.Size.Height]; // Create array to speed-up operations (Bitmap functions are very slow)
-            float[,] houghImage = new float[houghSize + 1, houghSize + 1];
 
             // Setup progress bar
             progressBar.Visible = true;
@@ -131,26 +130,24 @@ namespace INFOIBV
             if (lineDetectionCheckbox.Checked)
             {
                 float[,] acc = Accumulator(grayscaleImage, int.Parse(houghThresholdVal.Text));
-                /*for (int x = 0; x < 180; x++)
+                int rmax = (int)Math.Sqrt(Math.Pow(OutputHeight, 2) + Math.Pow(OutputWidth, 2));
+                houghImage = new float[rmax*2 + 1, rmax*2 + 1];
+                houghImageBitmap = new Bitmap(180, rmax * 2);
+                houghImageOutput.Image = houghImageBitmap;
+
+                for (int x = 0; x < 180; x++)
                 {
-                    for (int y = 0; y < houghSize; y++)
+                    for (int y = 0; y < rmax*2; y++)
                     {
                         houghImage[x, y] = acc[x, y];
-                    }
-                }
-                for (int i = 0; i < 180; i++)
-                {
-                    for (int j = 0; j < houghSize; j++)
-                    {
-                        int val = truncate((int)houghImage[i, j]);
+                        int val = truncate((int)houghImage[x, y]);
                         Color color = Color.FromArgb(val, val, val);
-                        houghImageBitmap.SetPixel(i, j, color);
+                        houghImageBitmap.SetPixel(x, y, color);
                     }
                 }
-                houghImageOutput.Image = houghImageBitmap;*/
+                houghImageOutput.Image = houghImageBitmap;
 
-                int rmax = (int)Math.Sqrt(Math.Pow(OutputHeight, 2) + Math.Pow(OutputWidth, 2));
-                for (int o = 0; o < 181; o++)
+                for (int o = 0; o <= 180; o++)
                 {
                     //Debug.WriteLine(o);
                     for (int r = 0; r < rmax*2; r++)
@@ -158,21 +155,6 @@ namespace INFOIBV
                         if (acc[o, r] == 255)
                         {
                             List<int[]> lines = LineDetection2(grayscaleImage, r-rmax, toRadian(o), int.Parse(minIntensityThresVal.Text), int.Parse(minLengthParVal.Text), int.Parse(maxGapParVal.Text));
-                            
-                            
-                            /*for (int i = 0; i < lines.Count(); i++)
-                            {
-                                int startx = lines[i][0];
-                                int starty = lines[i][1];
-                                int endx = lines[i][2];
-                                int endy = lines[i][3];
-                                Debug.WriteLine(startx + " " + endx + " " + starty + " " + endy);
-                                for (int x = startx; x < endx; x++)
-                                {
-                                    int y = (int)(((r - rmax / 2) + Math.Cos(o) * x) / (Math.Sin(o)));
-                                    grayscaleImage[x, y] = 255;
-                                }
-                            }*/
                         }
                     }
                 }
@@ -310,11 +292,11 @@ namespace INFOIBV
         }
 
         //LineDetection Tim
-        private List<int[]> LineDetection2(int[,] img, int r, double o, int minThreshold, int minLength, int maxGap)
+        private List<int[]> LineDetection2(int[,] img, double r, double o, int minThreshold, int minLength, int maxGap)
         {
-            int posX = (int)(Math.Sin(o) * r);
-            int posY = (int)(Math.Cos(o) * r);
-            //o = (o + toRadian(90))%toRadian(180);
+            double posX = Math.Cos(o) * r;
+            double posY = Math.Sin(o) * r;
+            o = (o + toRadian(90))%toRadian(180);
             double dx = Math.Cos(o);
             double dy = Math.Sin(o);
             Debug.WriteLine(toDegree(o) + " " + o + " " + r + " " + posX + " " + posY + " " + dx + " " + dy);
@@ -322,8 +304,8 @@ namespace INFOIBV
             int rmax = (int)Math.Sqrt(Math.Pow(OutputHeight, 2) + Math.Pow(OutputWidth, 2));
             for (int i = -rmax; i < rmax; i++)
             {
-                int x = (int)(posX + dx * i);
-                int y = (int)(posY + dy * i);
+                int x = (int)Math.Round(posX + dx * i);
+                int y = (int)Math.Round(posY + dy * i);
                 if (x >= 0 && y >= 0 && x < OutputWidth && y < OutputHeight)
                 {
                     img[x, y] = 255;
@@ -385,6 +367,7 @@ namespace INFOIBV
                     }
                 }
             }
+            
             // non-maximum suppression
             for (int x = 0; x < 180; x++)
             {
@@ -412,40 +395,6 @@ namespace INFOIBV
             }
             return acc;
         }
-
-        //LineDetection Timo (NOT IN USE)
-        private List<int[]> lineDetection2(int[,] img, float[,] houghImage)
-        {
-            List<int[]> lines = new List<int[]>();
-            for (int r = 0; r < houghImage.GetLength(1) - 1; r++)
-            {
-                for (int o = 0; o < houghImage.GetLength(0) - 1; o++)
-                {
-                    if (houghImage[o, r] == 255)
-                    {
-                        //Debug.WriteLine("NEW PIXEL");
-                        float actualo = o * maxAngle / houghSize;
-                        float actualr = (r-b)/a;
-                        //Debug.WriteLine(actualo + " " + actualr);
-                        int startXpos = (int)Math.Round(Math.Cos(actualo) * actualr) +OutputWidth/2;
-                        int startYpos = (int)Math.Round(Math.Sin(actualo) * actualr) +OutputHeight/2;
-                        //Debug.WriteLine(startXpos + " " + startYpos);
-                        float angle = (float)(o * 180 / Math.PI);
-                        angle = (angle + 90) % 180;
-                        angle = (float)(angle * Math.PI / 180);
-                        for (int x = startXpos; x < startXpos+20; x++)
-                        {
-                            int y = startYpos+(int)Math.Round(x*Math.Tan(angle));
-                            if(x > 0 && y > 0 && x < OutputWidth && y < OutputHeight)
-                                img[x, y] = 255;
-                            //Debug.WriteLine(x + " " + y);
-                        }
-                    }
-                }
-            }
-            return lines;
-        }
-
 
 
 
