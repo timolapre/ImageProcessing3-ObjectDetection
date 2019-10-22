@@ -53,6 +53,7 @@ namespace INFOIBV
             this.minLengthParVal = new System.Windows.Forms.TextBox();
             this.maxGapParVal = new System.Windows.Forms.TextBox();
             this.lineDetectionCheckbox = new System.Windows.Forms.CheckBox();
+            this.circleDetection = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.houghImageOutput)).BeginInit();
@@ -276,6 +277,14 @@ namespace INFOIBV
             this.lineDetectionCheckbox.Text = "Line Detection";
             this.lineDetectionCheckbox.UseVisualStyleBackColor = true;
             // 
+            // circleDetection
+            // 
+            this.circleDetection.Location = new System.Drawing.Point(1461, 20);
+            this.circleDetection.Name = "circleDetection";
+            this.circleDetection.Text = "Circle Detection";
+            this.circleDetection.Size = new System.Drawing.Size(104, 24);
+            this.circleDetection.TabIndex = 32;
+            // 
             // INFOIBV
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -301,6 +310,7 @@ namespace INFOIBV
             this.Controls.Add(this.applyButton);
             this.Controls.Add(this.imageFileName);
             this.Controls.Add(this.LoadImageButton);
+            this.Controls.Add(this.circleDetection);
             this.Location = new System.Drawing.Point(10, 10);
             this.Margin = new System.Windows.Forms.Padding(5);
             this.Name = "INFOIBV";
@@ -339,6 +349,7 @@ namespace INFOIBV
         private TextBox minLengthParVal;
         private TextBox maxGapParVal;
         private CheckBox lineDetectionCheckbox;
+        private CheckBox circleDetection;
     }
 }
 

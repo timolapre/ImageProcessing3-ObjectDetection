@@ -171,6 +171,25 @@ namespace INFOIBV
                 }
             }
 
+            // circle detection
+            if (circleDetection.Checked)
+            {
+                int[,,] accumulator = CircleAccumulator(grayscaleImage, 80);
+                for (int a = 0; a < InputImage.Width; a++)
+                {
+                    for (int b = 0; b < InputImage.Height; b++)
+                    {
+                        for (int r = 0; r < 100; r++)
+                        {
+                            if (accumulator[a, b, r] > 0)
+                            {
+                                DrawCircle(ref Image, a, b, r);
+                            }
+                        }
+                    }
+                }
+            }
+
             //==========================================================================================
 
             // Copy array to output Bitmap
@@ -344,6 +363,94 @@ namespace INFOIBV
                 }
             }
             return houghImage;
+        }
+
+        private void DrawCircle(ref Color[,] img, int a, int b, int r)
+        {
+            for (int i = 0; i < 360; i++)
+            {
+                int x = (int)(Math.Cos(toRadian(i)) * r + a);
+                int y = (int)(Math.Sin(toRadian(i)) * r + b);
+                img[x, y] = Color.FromArgb(255,0,0); 
+            }
+        }
+
+        private int[,,] CircleAccumulator(int[,] img, int threshold)
+        {
+            int rmin = 10; // minimum radius of a circle to be deteced
+            int rmax = 100; // maximum radius of a circle to be detected
+            int[,,] acc = new int[InputImage.Width, InputImage.Height, rmax];
+            for (int x = 0; x < InputImage.Width; x++)
+            {
+                for (int y = 0; y < InputImage.Height; y++)
+                {
+                    if (img[x, y] < 255) continue;
+                    //Debug.WriteLine("pixel " + x + ", " + y);
+                    for (int r = rmin; r < rmax; r++)
+                    {
+                        for (int t = 0; t < 360; t +=2)
+                        {
+                            int a = (int)(x - r * Math.Cos(t * Math.PI / 180));
+                            int b = (int)(y - r * Math.Sin(t * Math.PI / 180));
+                            if (a < 0 || a >= InputImage.Width) continue;
+                            if (b < 0 || b >= InputImage.Height) continue;
+                            acc[a, b, r] += 1;
+                        }
+                    }
+                }
+            }
+            Debug.WriteLine("start supression");
+            // 3d non-max suppression
+            for (int x = 0; x < InputImage.Width; x++)
+            {
+                for (int y = 0; y < InputImage.Height; y++)
+                {
+                    for (int r = rmin; r < rmax; r++)
+                    {
+                        int value = acc[x, y, r];
+                        if (value < threshold)
+                        {
+                            acc[x, y, r] = 0;
+                            continue;
+                        }
+
+                        int n1 = acc[Math.Max(Math.Min(InputImage.Width, x - 1), 0), Math.Max(Math.Min(InputImage.Height, y + 1), 0), Math.Max(Math.Min(359, r), 0)];
+                        int n2 = acc[Math.Max(Math.Min(InputImage.Width, x), 0), Math.Max(Math.Min(InputImage.Height, y + 1), 0), Math.Max(Math.Min(359, r), 0)];
+                        int n3 = acc[Math.Max(Math.Min(InputImage.Width, x + 1), 0), Math.Max(Math.Min(InputImage.Height, y + 1), 0), Math.Max(Math.Min(359, r), 0)];
+                        int n4 = acc[Math.Max(Math.Min(InputImage.Width, x - 1), 0), Math.Max(Math.Min(InputImage.Height, y), 0), Math.Max(Math.Min(359, r), 0)];
+                        int n5 = acc[Math.Max(Math.Min(InputImage.Width, x + 1), 0), Math.Max(Math.Min(InputImage.Height, y), 0), Math.Max(Math.Min(359, r), 0)];
+                        int n6 = acc[Math.Max(Math.Min(InputImage.Width, x - 1), 0), Math.Max(Math.Min(InputImage.Height, y - 1), 0), Math.Max(Math.Min(359, r), 0)];
+                        int n7 = acc[Math.Max(Math.Min(InputImage.Width, x), 0), Math.Max(Math.Min(InputImage.Height, y - 1), 0), Math.Max(Math.Min(359, r), 0)];
+                        int n8 = acc[Math.Max(Math.Min(InputImage.Width, x + 1), 0), Math.Max(Math.Min(InputImage.Height, y - 1), 0), Math.Max(Math.Min(359, r), 0)];
+
+                        int n9 = acc[Math.Max(Math.Min(InputImage.Width, x - 1), 0), Math.Max(Math.Min(InputImage.Height, y + 1), 0), Math.Max(Math.Min(359, r - 1), 0)];
+                        int n10 = acc[Math.Max(Math.Min(InputImage.Width, x), 0), Math.Max(Math.Min(InputImage.Height, y + 1), 0), Math.Max(Math.Min(359, r - 1), 0)];
+                        int n11 = acc[Math.Max(Math.Min(InputImage.Width, x + 1), 0), Math.Max(Math.Min(InputImage.Height, y + 1), 0), Math.Max(Math.Min(359, r - 1), 0)];
+                        int n12 = acc[Math.Max(Math.Min(InputImage.Width, x - 1), 0), Math.Max(Math.Min(InputImage.Height, y), 0), Math.Max(Math.Min(359, r - 1), 0)];
+                        int n13 = acc[Math.Max(Math.Min(InputImage.Width, x), 0), Math.Max(Math.Min(InputImage.Height, y), 0), Math.Max(Math.Min(359, r - 1), 0)];
+                        int n14 = acc[Math.Max(Math.Min(InputImage.Width, x + 1), 0), Math.Max(Math.Min(InputImage.Height, y), 0), Math.Max(Math.Min(359, r - 1), 0)];
+                        int n15 = acc[Math.Max(Math.Min(InputImage.Width, x - 1), 0), Math.Max(Math.Min(InputImage.Height, y - 1), 0), Math.Max(Math.Min(359, r - 1), 0)];
+                        int n16 = acc[Math.Max(Math.Min(InputImage.Width, x), 0), Math.Max(Math.Min(InputImage.Height, y - 1), 0), Math.Max(Math.Min(359, r - 1), 0)];
+                        int n17 = acc[Math.Max(Math.Min(InputImage.Width, x + 1), 0), Math.Max(Math.Min(InputImage.Height, y - 1), 0), Math.Max(Math.Min(359, r - 1), 0)];
+
+                        int n18 = acc[Math.Max(Math.Min(InputImage.Width, x - 1), 0), Math.Max(Math.Min(InputImage.Height, y + 1), 0), Math.Max(Math.Min(359, r + 1), 0)];
+                        int n19 = acc[Math.Max(Math.Min(InputImage.Width, x), 0), Math.Max(Math.Min(InputImage.Height, y + 1), 0), Math.Max(Math.Min(359, r + 1), 0)];
+                        int n20 = acc[Math.Max(Math.Min(InputImage.Width, x + 1), 0), Math.Max(Math.Min(InputImage.Height, y + 1), 0), Math.Max(Math.Min(359, r + 1), 0)];
+                        int n21 = acc[Math.Max(Math.Min(InputImage.Width, x - 1), 0), Math.Max(Math.Min(InputImage.Height, y), 0), Math.Max(Math.Min(359, r + 1), 0)];
+                        int n22 = acc[Math.Max(Math.Min(InputImage.Width, x), 0), Math.Max(Math.Min(InputImage.Height, y), 0), Math.Max(Math.Min(359, r + 1), 0)];
+                        int n23 = acc[Math.Max(Math.Min(InputImage.Width, x + 1), 0), Math.Max(Math.Min(InputImage.Height, y), 0), Math.Max(Math.Min(359, r + 1), 0)];
+                        int n24 = acc[Math.Max(Math.Min(InputImage.Width, x - 1), 0), Math.Max(Math.Min(InputImage.Height, y - 1), 0), Math.Max(Math.Min(359, r + 1), 0)];
+                        int n25 = acc[Math.Max(Math.Min(InputImage.Width, x), 0), Math.Max(Math.Min(InputImage.Height, y - 1), 0), Math.Max(Math.Min(359, r + 1), 0)];
+                        int n26 = acc[Math.Max(Math.Min(InputImage.Width, x + 1), 0), Math.Max(Math.Min(InputImage.Height, y - 1), 0), Math.Max(Math.Min(359, r + 1), 0)];
+
+                        if (n1 > value || n2 > value || n3 > value || n4 > value || n5 > value || n6 > value || n7 > value || n8 > value || n9 > value || n10 > value || n11 > value || n12 > value || n13 > value || n14 > value || n15 > value || n16 > value || n17 > value || n18 > value || n19 > value || n20 > value || n21 > value || n22 > value || n23 > value || n24 > value || n25 > value || n26 > value)
+                        {
+                            acc[x, y, r] = 0;
+                        }
+                    }
+                }
+            }
+            return acc;
         }
 
         // returns (theta, r) pairs, stored in a 2d array
