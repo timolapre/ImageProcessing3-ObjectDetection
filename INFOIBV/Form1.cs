@@ -199,7 +199,7 @@ namespace INFOIBV
             // circle detection
             if (circleDetection.Checked)
             {
-                int[,,] accumulator = CircleAccumulator(grayscaleImage, 80);
+                int[,,] accumulator = CircleAccumulator(grayscaleImage, int.Parse(CircleThreshold.Text));
                 for (int a = 0; a < InputImage.Width; a++)
                 {
                     for (int b = 0; b < InputImage.Height; b++)

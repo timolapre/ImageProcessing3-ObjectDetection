@@ -57,6 +57,7 @@ namespace INFOIBV
             this.ComplementCheckbox = new System.Windows.Forms.CheckBox();
             this.ContrastAdjustmentCheckbox = new System.Windows.Forms.CheckBox();
             this.circleDetection = new System.Windows.Forms.CheckBox();
+            this.CircleThreshold = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.houghImageOutput)).BeginInit();
@@ -324,11 +325,20 @@ namespace INFOIBV
             this.circleDetection.Text = "Circle Detection";
             this.circleDetection.UseVisualStyleBackColor = true;
             // 
+            // CircleThreshold
+            // 
+            this.CircleThreshold.Location = new System.Drawing.Point(1609, 83);
+            this.CircleThreshold.Name = "CircleThreshold";
+            this.CircleThreshold.Size = new System.Drawing.Size(100, 22);
+            this.CircleThreshold.TabIndex = 36;
+            this.CircleThreshold.Text = "100";
+            // 
             // INFOIBV
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1833, 935);
+            this.Controls.Add(this.CircleThreshold);
             this.Controls.Add(this.circleDetection);
             this.Controls.Add(this.ContrastAdjustmentCheckbox);
             this.Controls.Add(this.ComplementCheckbox);
@@ -395,5 +405,6 @@ namespace INFOIBV
         private CheckBox ComplementCheckbox;
         private CheckBox ContrastAdjustmentCheckbox;
         private CheckBox circleDetection;
+        private TextBox CircleThreshold;
     }
 }
