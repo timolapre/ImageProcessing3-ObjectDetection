@@ -92,6 +92,25 @@ namespace INFOIBV
                 }
             }
 
+            if (EdgDetection.Checked)
+            {
+                int[,] ImageX = applyKernel(grayscaleImage, createEdgeKernel(true));
+                int[,] ImageY = applyKernel(grayscaleImage, createEdgeKernel(false));
+                for (int i = 0; i < Image.GetLength(0); i++)
+                {
+                    for (int j = 0; j < Image.GetLength(1); j++)
+                    {
+                        //Debug.WriteLine(ImageX[i, j]);
+                        int color = (int)Math.Sqrt(Math.Pow(ImageX[i, j], 2) + Math.Pow(ImageY[i, j], 2));
+                        grayscaleImage[i, j] = color;
+                    }
+                }
+            }
+
+            if (ComplementCheckbox.Checked) {
+                complement(grayscaleImage);
+            }
+
             //grayscaleImage = fullRangeContrastImage(grayscaleImage);
             //grayscaleImage = edgeDetection(grayscaleImage);
 
@@ -259,7 +278,7 @@ namespace INFOIBV
                     int i = (int)((r + Math.Cos(o) * x) / (Math.Sin(o)));
                     if (y == i)
                     {
-                        Debug.WriteLine(x + " " + y);
+                        //Debug.WriteLine(x + " " + y);
                         lines[x, y] = 1;
                     }
                 }
@@ -318,7 +337,7 @@ namespace INFOIBV
             o = (o + toRadian(90))%toRadian(180);
             double dx = Math.Cos(o);
             double dy = Math.Sin(o);
-            Debug.WriteLine(toDegree(o) + " " + o + " " + r + " " + posX + " " + posY + " " + dx + " " + dy);
+            //Debug.WriteLine(toDegree(o) + " " + o + " " + r + " " + posX + " " + posY + " " + dx + " " + dy);
             //Debug.WriteLine(Math.Cos(o) + " " + posX / Math.Cos(o));
             int rmax = (int)Math.Sqrt(Math.Pow(OutputHeight, 2) + Math.Pow(OutputWidth, 2));
             for (int i = -rmax; i < rmax; i++)
