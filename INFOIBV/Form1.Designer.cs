@@ -53,6 +53,8 @@ namespace INFOIBV
             this.minLengthParVal = new System.Windows.Forms.TextBox();
             this.maxGapParVal = new System.Windows.Forms.TextBox();
             this.lineDetectionCheckbox = new System.Windows.Forms.CheckBox();
+            this.EdgDetection = new System.Windows.Forms.CheckBox();
+            this.ComplementCheckbox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.houghImageOutput)).BeginInit();
@@ -276,11 +278,35 @@ namespace INFOIBV
             this.lineDetectionCheckbox.Text = "Line Detection";
             this.lineDetectionCheckbox.UseVisualStyleBackColor = true;
             // 
+            // EdgDetection
+            // 
+            this.EdgDetection.AutoSize = true;
+            this.EdgDetection.Location = new System.Drawing.Point(1460, 20);
+            this.EdgDetection.Margin = new System.Windows.Forms.Padding(5);
+            this.EdgDetection.Name = "EdgDetection";
+            this.EdgDetection.Size = new System.Drawing.Size(127, 21);
+            this.EdgDetection.TabIndex = 32;
+            this.EdgDetection.Text = "Edge Detection";
+            this.EdgDetection.UseVisualStyleBackColor = true;
+            // 
+            // ComplementCheckbox
+            // 
+            this.ComplementCheckbox.AutoSize = true;
+            this.ComplementCheckbox.Location = new System.Drawing.Point(1619, 141);
+            this.ComplementCheckbox.Margin = new System.Windows.Forms.Padding(5);
+            this.ComplementCheckbox.Name = "ComplementCheckbox";
+            this.ComplementCheckbox.Size = new System.Drawing.Size(108, 21);
+            this.ComplementCheckbox.TabIndex = 33;
+            this.ComplementCheckbox.Text = "Complement";
+            this.ComplementCheckbox.UseVisualStyleBackColor = true;
+            // 
             // INFOIBV
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1833, 935);
+            this.Controls.Add(this.ComplementCheckbox);
+            this.Controls.Add(this.EdgDetection);
             this.Controls.Add(this.lineDetectionCheckbox);
             this.Controls.Add(this.maxGapParVal);
             this.Controls.Add(this.minLengthParVal);
@@ -339,6 +365,8 @@ namespace INFOIBV
         private TextBox minLengthParVal;
         private TextBox maxGapParVal;
         private CheckBox lineDetectionCheckbox;
+        private CheckBox EdgDetection;
+        private CheckBox ComplementCheckbox;
     }
 }
 
