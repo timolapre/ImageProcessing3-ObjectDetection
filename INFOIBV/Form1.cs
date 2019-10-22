@@ -92,6 +92,16 @@ namespace INFOIBV
                 }
             }
 
+            if (ContrastAdjustmentCheckbox.Checked)
+            {
+                grayscaleImage = fullRangeContrastImage(grayscaleImage);
+            }
+
+            if (ComplementCheckbox.Checked)
+            {
+                complement(grayscaleImage);
+            }
+
             if (EdgDetection.Checked)
             {
                 int[,] ImageX = applyKernel(grayscaleImage, createEdgeKernel(true));
@@ -105,10 +115,6 @@ namespace INFOIBV
                         grayscaleImage[i, j] = color;
                     }
                 }
-            }
-
-            if (ComplementCheckbox.Checked) {
-                complement(grayscaleImage);
             }
 
             //grayscaleImage = fullRangeContrastImage(grayscaleImage);
@@ -645,7 +651,7 @@ namespace INFOIBV
             int grayscale = (int)((pixelColor.R * 0.3f) + (pixelColor.G * 0.59f) + (pixelColor.B * 0.11f));
             return grayscale;
         }
-        
+
 
 
 

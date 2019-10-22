@@ -55,13 +55,15 @@ namespace INFOIBV
             this.lineDetectionCheckbox = new System.Windows.Forms.CheckBox();
             this.EdgDetection = new System.Windows.Forms.CheckBox();
             this.ComplementCheckbox = new System.Windows.Forms.CheckBox();
+            this.ContrastAdjustmentCheckbox = new System.Windows.Forms.CheckBox();
+            this.circleDetection = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.houghImageOutput)).BeginInit();
             this.SuspendLayout();
-            //
+            // 
             // LoadImageButton
-            //
+            // 
             this.LoadImageButton.Location = new System.Drawing.Point(16, 15);
             this.LoadImageButton.Margin = new System.Windows.Forms.Padding(4);
             this.LoadImageButton.Name = "LoadImageButton";
@@ -70,30 +72,30 @@ namespace INFOIBV
             this.LoadImageButton.Text = "Load image...";
             this.LoadImageButton.UseVisualStyleBackColor = true;
             this.LoadImageButton.Click += new System.EventHandler(this.LoadImageButton_Click);
-            //
+            // 
             // openImageDialog
-            //
+            // 
             this.openImageDialog.Filter = "Bitmap files (*.bmp;*.gif;*.jpg;*.png;*.tiff;*.jpeg)|*.bmp;*.gif;*.jpg;*.png;*.ti" +
     "ff;*.jpeg";
             this.openImageDialog.InitialDirectory = "..\\..\\images";
-            //
+            // 
             // imageFileName
-            //
+            // 
             this.imageFileName.Location = new System.Drawing.Point(155, 17);
             this.imageFileName.Margin = new System.Windows.Forms.Padding(4);
             this.imageFileName.Name = "imageFileName";
             this.imageFileName.ReadOnly = true;
             this.imageFileName.Size = new System.Drawing.Size(420, 22);
             this.imageFileName.TabIndex = 1;
-            //
+            // 
             // openImageDialog2
-            //
+            // 
             this.openImageDialog2.Filter = "Bitmap files (*.bmp;*.gif;*.jpg;*.png;*.tiff;*.jpeg)|*.bmp;*.gif;*.jpg;*.png;*.ti" +
     "ff;*.jpeg";
             this.openImageDialog2.InitialDirectory = "..\\..\\images";
-            //
+            // 
             // pictureBox1
-            //
+            // 
             this.pictureBox1.Location = new System.Drawing.Point(16, 62);
             this.pictureBox1.Margin = new System.Windows.Forms.Padding(4);
             this.pictureBox1.Name = "pictureBox1";
@@ -101,9 +103,9 @@ namespace INFOIBV
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBox1.TabIndex = 2;
             this.pictureBox1.TabStop = false;
-            //
+            // 
             // applyButton
-            //
+            // 
             this.applyButton.Location = new System.Drawing.Point(637, 15);
             this.applyButton.Margin = new System.Windows.Forms.Padding(4);
             this.applyButton.Name = "applyButton";
@@ -112,14 +114,14 @@ namespace INFOIBV
             this.applyButton.Text = "Apply";
             this.applyButton.UseVisualStyleBackColor = true;
             this.applyButton.Click += new System.EventHandler(this.applyButton_Click);
-            //
+            // 
             // saveImageDialog
-            //
+            // 
             this.saveImageDialog.Filter = "Bitmap file (*.bmp)|*.bmp";
             this.saveImageDialog.InitialDirectory = "..\\..\\images";
-            //
+            // 
             // saveButton
-            //
+            // 
             this.saveButton.Location = new System.Drawing.Point(1176, 15);
             this.saveButton.Margin = new System.Windows.Forms.Padding(4);
             this.saveButton.Name = "saveButton";
@@ -128,9 +130,9 @@ namespace INFOIBV
             this.saveButton.Text = "Save as BMP...";
             this.saveButton.UseVisualStyleBackColor = true;
             this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
-            //
+            // 
             // pictureBox2
-            //
+            // 
             this.pictureBox2.Location = new System.Drawing.Point(624, 62);
             this.pictureBox2.Margin = new System.Windows.Forms.Padding(4);
             this.pictureBox2.Name = "pictureBox2";
@@ -138,9 +140,9 @@ namespace INFOIBV
             this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBox2.TabIndex = 5;
             this.pictureBox2.TabStop = false;
-            //
+            // 
             // progressBar
-            //
+            // 
             this.progressBar.Location = new System.Drawing.Point(783, 17);
             this.progressBar.Margin = new System.Windows.Forms.Padding(4);
             this.progressBar.Name = "progressBar";
@@ -148,9 +150,9 @@ namespace INFOIBV
             this.progressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.progressBar.TabIndex = 6;
             this.progressBar.Visible = false;
-            //
+            // 
             // BoundaryTrace
-            //
+            // 
             this.BoundaryTrace.AutoSize = true;
             this.BoundaryTrace.Location = new System.Drawing.Point(1312, 20);
             this.BoundaryTrace.Margin = new System.Windows.Forms.Padding(5);
@@ -159,9 +161,9 @@ namespace INFOIBV
             this.BoundaryTrace.TabIndex = 19;
             this.BoundaryTrace.Text = "Boundary trace";
             this.BoundaryTrace.UseVisualStyleBackColor = true;
-            //
+            // 
             // BiggestShape
-            //
+            // 
             this.BiggestShape.AutoSize = true;
             this.BiggestShape.Location = new System.Drawing.Point(1312, 62);
             this.BiggestShape.Margin = new System.Windows.Forms.Padding(5);
@@ -171,9 +173,9 @@ namespace INFOIBV
             this.BiggestShape.Text = "Biggest shape";
             this.BiggestShape.UseVisualStyleBackColor = true;
             this.BiggestShape.CheckedChanged += new System.EventHandler(this.BiggestShape_CheckedChanged);
-            //
+            // 
             // FullShapes
-            //
+            // 
             this.FullShapes.AutoSize = true;
             this.FullShapes.Location = new System.Drawing.Point(1312, 41);
             this.FullShapes.Margin = new System.Windows.Forms.Padding(5);
@@ -183,9 +185,9 @@ namespace INFOIBV
             this.FullShapes.Text = "Full shapes";
             this.FullShapes.UseVisualStyleBackColor = true;
             this.FullShapes.CheckedChanged += new System.EventHandler(this.FullShapes_CheckedChanged);
-            //
+            // 
             // houghTransformCheckbox
-            //
+            // 
             this.houghTransformCheckbox.AutoSize = true;
             this.houghTransformCheckbox.Location = new System.Drawing.Point(1461, 41);
             this.houghTransformCheckbox.Margin = new System.Windows.Forms.Padding(5);
@@ -195,9 +197,9 @@ namespace INFOIBV
             this.houghTransformCheckbox.Text = "Hough Transform";
             this.houghTransformCheckbox.UseVisualStyleBackColor = true;
             this.houghTransformCheckbox.CheckedChanged += new System.EventHandler(this.houghTransformCheckbox_CheckedChanged);
-            //
+            // 
             // houghImageOutput
-            //
+            // 
             this.houghImageOutput.Location = new System.Drawing.Point(1257, 171);
             this.houghImageOutput.Margin = new System.Windows.Forms.Padding(4);
             this.houghImageOutput.Name = "houghImageOutput";
@@ -205,9 +207,9 @@ namespace INFOIBV
             this.houghImageOutput.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.houghImageOutput.TabIndex = 23;
             this.houghImageOutput.TabStop = false;
-            //
+            // 
             // houghThresholdCheckbox
-            //
+            // 
             this.houghThresholdCheckbox.AutoSize = true;
             this.houghThresholdCheckbox.Location = new System.Drawing.Point(1461, 62);
             this.houghThresholdCheckbox.Margin = new System.Windows.Forms.Padding(5);
@@ -216,59 +218,59 @@ namespace INFOIBV
             this.houghThresholdCheckbox.TabIndex = 24;
             this.houghThresholdCheckbox.Text = "Hough Threshold";
             this.houghThresholdCheckbox.UseVisualStyleBackColor = true;
-            //
+            // 
             // houghThresholdVal
-            //
+            // 
             this.houghThresholdVal.Location = new System.Drawing.Point(1609, 62);
             this.houghThresholdVal.Name = "houghThresholdVal";
             this.houghThresholdVal.Size = new System.Drawing.Size(100, 22);
             this.houghThresholdVal.TabIndex = 25;
             this.houghThresholdVal.Text = "100";
-            //
+            // 
             // houghAngleMaxValue
-            //
+            // 
             this.houghAngleMaxValue.Location = new System.Drawing.Point(1715, 41);
             this.houghAngleMaxValue.Name = "houghAngleMaxValue";
             this.houghAngleMaxValue.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.houghAngleMaxValue.Size = new System.Drawing.Size(100, 22);
             this.houghAngleMaxValue.TabIndex = 26;
             this.houghAngleMaxValue.Text = "180";
-            //
+            // 
             // houghAngleMinValue
-            //
+            // 
             this.houghAngleMinValue.Location = new System.Drawing.Point(1609, 40);
             this.houghAngleMinValue.Name = "houghAngleMinValue";
             this.houghAngleMinValue.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.houghAngleMinValue.Size = new System.Drawing.Size(100, 22);
             this.houghAngleMinValue.TabIndex = 27;
             this.houghAngleMinValue.Text = "0";
-            //
+            // 
             // minIntensityThresVal
-            //
+            // 
             this.minIntensityThresVal.Location = new System.Drawing.Point(1257, 142);
             this.minIntensityThresVal.Name = "minIntensityThresVal";
             this.minIntensityThresVal.Size = new System.Drawing.Size(100, 22);
             this.minIntensityThresVal.TabIndex = 28;
             this.minIntensityThresVal.Text = "100";
-            //
+            // 
             // minLengthParVal
-            //
+            // 
             this.minLengthParVal.Location = new System.Drawing.Point(1363, 142);
             this.minLengthParVal.Name = "minLengthParVal";
             this.minLengthParVal.Size = new System.Drawing.Size(100, 22);
             this.minLengthParVal.TabIndex = 29;
             this.minLengthParVal.Text = "1";
-            //
+            // 
             // maxGapParVal
-            //
+            // 
             this.maxGapParVal.Location = new System.Drawing.Point(1469, 142);
             this.maxGapParVal.Name = "maxGapParVal";
             this.maxGapParVal.Size = new System.Drawing.Size(100, 22);
             this.maxGapParVal.TabIndex = 30;
             this.maxGapParVal.Text = "1";
-            //
+            // 
             // lineDetectionCheckbox
-            //
+            // 
             this.lineDetectionCheckbox.AutoSize = true;
             this.lineDetectionCheckbox.Location = new System.Drawing.Point(1257, 113);
             this.lineDetectionCheckbox.Margin = new System.Windows.Forms.Padding(5);
@@ -277,9 +279,9 @@ namespace INFOIBV
             this.lineDetectionCheckbox.TabIndex = 31;
             this.lineDetectionCheckbox.Text = "Line Detection";
             this.lineDetectionCheckbox.UseVisualStyleBackColor = true;
-            //
+            // 
             // EdgDetection
-            //
+            // 
             this.EdgDetection.AutoSize = true;
             this.EdgDetection.Location = new System.Drawing.Point(1460, 20);
             this.EdgDetection.Margin = new System.Windows.Forms.Padding(5);
@@ -288,23 +290,47 @@ namespace INFOIBV
             this.EdgDetection.TabIndex = 32;
             this.EdgDetection.Text = "Edge Detection";
             this.EdgDetection.UseVisualStyleBackColor = true;
-            //
+            // 
             // ComplementCheckbox
-            //
+            // 
             this.ComplementCheckbox.AutoSize = true;
-            this.ComplementCheckbox.Location = new System.Drawing.Point(1619, 141);
+            this.ComplementCheckbox.Location = new System.Drawing.Point(1619, 113);
             this.ComplementCheckbox.Margin = new System.Windows.Forms.Padding(5);
             this.ComplementCheckbox.Name = "ComplementCheckbox";
             this.ComplementCheckbox.Size = new System.Drawing.Size(108, 21);
             this.ComplementCheckbox.TabIndex = 33;
             this.ComplementCheckbox.Text = "Complement";
             this.ComplementCheckbox.UseVisualStyleBackColor = true;
-            //
+            // 
+            // ContrastAdjustmentCheckbox
+            // 
+            this.ContrastAdjustmentCheckbox.AutoSize = true;
+            this.ContrastAdjustmentCheckbox.Location = new System.Drawing.Point(1619, 141);
+            this.ContrastAdjustmentCheckbox.Margin = new System.Windows.Forms.Padding(5);
+            this.ContrastAdjustmentCheckbox.Name = "ContrastAdjustmentCheckbox";
+            this.ContrastAdjustmentCheckbox.Size = new System.Drawing.Size(157, 21);
+            this.ContrastAdjustmentCheckbox.TabIndex = 34;
+            this.ContrastAdjustmentCheckbox.Text = "Contrast Adjustment";
+            this.ContrastAdjustmentCheckbox.UseVisualStyleBackColor = true;
+            // 
+            // circleDetection
+            // 
+            this.circleDetection.AutoSize = true;
+            this.circleDetection.Location = new System.Drawing.Point(1461, 82);
+            this.circleDetection.Margin = new System.Windows.Forms.Padding(5);
+            this.circleDetection.Name = "circleDetection";
+            this.circleDetection.Size = new System.Drawing.Size(129, 21);
+            this.circleDetection.TabIndex = 35;
+            this.circleDetection.Text = "Circle Detection";
+            this.circleDetection.UseVisualStyleBackColor = true;
+            // 
             // INFOIBV
-            //
+            // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1833, 935);
+            this.Controls.Add(this.circleDetection);
+            this.Controls.Add(this.ContrastAdjustmentCheckbox);
             this.Controls.Add(this.ComplementCheckbox);
             this.Controls.Add(this.EdgDetection);
             this.Controls.Add(this.lineDetectionCheckbox);
@@ -327,7 +353,6 @@ namespace INFOIBV
             this.Controls.Add(this.applyButton);
             this.Controls.Add(this.imageFileName);
             this.Controls.Add(this.LoadImageButton);
-            this.Controls.Add(this.circleDetection);
             this.Location = new System.Drawing.Point(10, 10);
             this.Margin = new System.Windows.Forms.Padding(5);
             this.Name = "INFOIBV";
@@ -368,5 +393,7 @@ namespace INFOIBV
         private CheckBox lineDetectionCheckbox;
         private CheckBox EdgDetection;
         private CheckBox ComplementCheckbox;
+        private CheckBox ContrastAdjustmentCheckbox;
+        private CheckBox circleDetection;
     }
 }
