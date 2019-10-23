@@ -204,7 +204,7 @@ namespace INFOIBV
                 {
                     for (int b = 0; b < InputImage.Height; b++)
                     {
-                        for (int r = 0; r < 100; r++)
+                        for (int r = 0; r < accumulator.GetLength(2); r++)
                         {
                             if (accumulator[a, b, r] > 0)
                             {
@@ -396,14 +396,15 @@ namespace INFOIBV
             {
                 int x = (int)(Math.Cos(toRadian(i)) * r + a);
                 int y = (int)(Math.Sin(toRadian(i)) * r + b);
+                if (x < 0 || x > InputImage.Width || y < 0 || y > InputImage.Height) continue;
                 img[x, y] = Color.FromArgb(255,0,0); 
             }
         }
 
         private int[,,] CircleAccumulator(int[,] img, int threshold)
         {
-            int rmin = 10; // minimum radius of a circle to be deteced
-            int rmax = 100; // maximum radius of a circle to be detected
+            int rmin = 5; // minimum radius of a circle to be deteced
+            int rmax = 40; // maximum radius of a circle to be detected
             int[,,] acc = new int[InputImage.Width, InputImage.Height, rmax];
             for (int x = 0; x < InputImage.Width; x++)
             {
