@@ -152,17 +152,29 @@ namespace INFOIBV
 
             //int[,] grayscaleValue = grayscaleImage;
 
+            //truncate and return grayscale image to actual image
+            for (int i = 0; i < OutputWidth; i++)
+            {
+                for (int j = 0; j < OutputHeight; j++)
+                {
+                    int color = truncate(grayscaleImage[i, j]);
+                    Image[i, j] = Color.FromArgb(color, color, color);
+                    progressBar.PerformStep();
+                }
+            }
+
+            // linedetection
             if (lineDetectionCheckbox.Checked)
             {
                 float[,] acc = Accumulator(grayscaleImage, int.Parse(houghThresholdVal.Text));
                 int rmax = (int)Math.Sqrt(Math.Pow(OutputHeight, 2) + Math.Pow(OutputWidth, 2));
-                houghImage = new float[rmax*2 + 1, rmax*2 + 1];
+                houghImage = new float[rmax * 2 + 1, rmax * 2 + 1];
                 houghImageBitmap = new Bitmap(180, rmax * 2);
                 houghImageOutput.Image = houghImageBitmap;
 
                 for (int x = 0; x < 180; x++)
                 {
-                    for (int y = 0; y < rmax*2; y++)
+                    for (int y = 0; y < rmax * 2; y++)
                     {
                         houghImage[x, y] = acc[x, y];
                         int val = truncate((int)houghImage[x, y]);
@@ -175,26 +187,16 @@ namespace INFOIBV
                 for (int o = 0; o <= 180; o++)
                 {
                     //Debug.WriteLine(o);
-                    for (int r = 0; r < rmax*2; r++)
+                    for (int r = 0; r < rmax * 2; r++)
                     {
                         if (acc[o, r] == 255)
                         {
-                            List<int[]> lines = LineDetection2(grayscaleImage, r-rmax, toRadian(o), int.Parse(minIntensityThresVal.Text), int.Parse(minLengthParVal.Text), int.Parse(maxGapParVal.Text));
+                            LineDetection2(ref Image, grayscaleImage,r - rmax, toRadian(o), int.Parse(minIntensityThresVal.Text), int.Parse(minLengthParVal.Text), int.Parse(maxGapParVal.Text));
                         }
                     }
                 }
             }
 
-            //truncate and return grayscale image to actual image
-            for (int i = 0; i < OutputWidth; i++)
-            {
-                for (int j = 0; j < OutputHeight; j++)
-                {
-                    int color = truncate(grayscaleImage[i, j]);
-                    Image[i, j] = Color.FromArgb(color, color, color);
-                    progressBar.PerformStep();
-                }
-            }
 
             // circle detection
             if (circleDetection.Checked)
@@ -336,8 +338,9 @@ namespace INFOIBV
         }
 
         //LineDetection Tim
-        private List<int[]> LineDetection2(int[,] img, double r, double o, int minThreshold, int minLength, int maxGap)
+        private void LineDetection2(ref Color[,] img, int[,] gray, double r, double o, int minThreshold, int minLength, int maxGap)
         {
+            int[,] lines = new int[img.GetLength(0),img.GetLength(1)];
             double posX = Math.Cos(o) * r;
             double posY = Math.Sin(o) * r;
             o = (o + toRadian(90))%toRadian(180);
@@ -350,13 +353,9 @@ namespace INFOIBV
             {
                 int x = (int)Math.Round(posX + dx * i);
                 int y = (int)Math.Round(posY + dy * i);
-                if (x >= 0 && y >= 0 && x < OutputWidth && y < OutputHeight)
-                {
-                    img[x, y] = 255;
-                    //Debug.WriteLine(posX + dx * i + " " + posY + dy * i);
-                }
+                if (x < 0 || y < 0 || x >= InputImage.Width || y >= InputImage.Height) continue;
+                img[x, y] = Color.FromArgb(0, 255, 0);
             }
-            return null;
         }
 
         //Option B. Basically thresholding hough image
