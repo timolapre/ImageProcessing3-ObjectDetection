@@ -45,10 +45,10 @@ namespace INFOIBV
             this.FullShapes = new System.Windows.Forms.CheckBox();
             this.houghTransformCheckbox = new System.Windows.Forms.CheckBox();
             this.houghImageOutput = new System.Windows.Forms.PictureBox();
-            this.houghThresholdCheckbox = new System.Windows.Forms.CheckBox();
             this.houghThresholdVal = new System.Windows.Forms.TextBox();
             this.houghAngleMaxValue = new System.Windows.Forms.TextBox();
             this.houghAngleMinValue = new System.Windows.Forms.TextBox();
+            this.houghThresholdCheckbox = new System.Windows.Forms.CheckBox();
             this.minIntensityThresVal = new System.Windows.Forms.TextBox();
             this.minLengthParVal = new System.Windows.Forms.TextBox();
             this.maxGapParVal = new System.Windows.Forms.TextBox();
@@ -209,17 +209,6 @@ namespace INFOIBV
             this.houghImageOutput.TabIndex = 23;
             this.houghImageOutput.TabStop = false;
             // 
-            // houghThresholdCheckbox
-            // 
-            this.houghThresholdCheckbox.AutoSize = true;
-            this.houghThresholdCheckbox.Location = new System.Drawing.Point(1461, 62);
-            this.houghThresholdCheckbox.Margin = new System.Windows.Forms.Padding(5);
-            this.houghThresholdCheckbox.Name = "houghThresholdCheckbox";
-            this.houghThresholdCheckbox.Size = new System.Drawing.Size(140, 21);
-            this.houghThresholdCheckbox.TabIndex = 24;
-            this.houghThresholdCheckbox.Text = "Hough Threshold";
-            this.houghThresholdCheckbox.UseVisualStyleBackColor = true;
-            // 
             // houghThresholdVal
             // 
             this.houghThresholdVal.Location = new System.Drawing.Point(1609, 62);
@@ -245,6 +234,14 @@ namespace INFOIBV
             this.houghAngleMinValue.Size = new System.Drawing.Size(100, 22);
             this.houghAngleMinValue.TabIndex = 27;
             this.houghAngleMinValue.Text = "0";
+            // 
+            // houghThresholdCheckbox
+            // 
+            this.houghThresholdCheckbox.Location = new System.Drawing.Point(1312, 81);
+            this.houghThresholdCheckbox.Name = "houghThresholdCheckbox";
+            this.houghThresholdCheckbox.Text = "hough threshold";
+            this.houghThresholdCheckbox.Size = new System.Drawing.Size(104, 24);
+            this.houghThresholdCheckbox.TabIndex = 37;
             // 
             // minIntensityThresVal
             // 
@@ -273,7 +270,7 @@ namespace INFOIBV
             // lineDetectionCheckbox
             // 
             this.lineDetectionCheckbox.AutoSize = true;
-            this.lineDetectionCheckbox.Location = new System.Drawing.Point(1257, 113);
+            this.lineDetectionCheckbox.Location = new System.Drawing.Point(1461, 62);
             this.lineDetectionCheckbox.Margin = new System.Windows.Forms.Padding(5);
             this.lineDetectionCheckbox.Name = "lineDetectionCheckbox";
             this.lineDetectionCheckbox.Size = new System.Drawing.Size(121, 21);
@@ -350,9 +347,9 @@ namespace INFOIBV
             this.Controls.Add(this.houghAngleMinValue);
             this.Controls.Add(this.houghAngleMaxValue);
             this.Controls.Add(this.houghThresholdVal);
-            this.Controls.Add(this.houghThresholdCheckbox);
             this.Controls.Add(this.houghImageOutput);
             this.Controls.Add(this.houghTransformCheckbox);
+            this.Controls.Add(this.houghThresholdCheckbox);
             this.Controls.Add(this.FullShapes);
             this.Controls.Add(this.BiggestShape);
             this.Controls.Add(this.pictureBox1);
@@ -393,10 +390,10 @@ namespace INFOIBV
         private CheckBox FullShapes;
         private CheckBox houghTransformCheckbox;
         private PictureBox houghImageOutput;
-        private CheckBox houghThresholdCheckbox;
         private TextBox houghThresholdVal;
         private TextBox houghAngleMaxValue;
         private TextBox houghAngleMinValue;
+        private CheckBox houghThresholdCheckbox;
         private TextBox minIntensityThresVal;
         private TextBox minLengthParVal;
         private TextBox maxGapParVal;

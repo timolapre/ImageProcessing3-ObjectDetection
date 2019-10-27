@@ -48,8 +48,6 @@ namespace INFOIBV
             }
         }
 
-
-
         //Do something with the image
         private void applyButton_Click(object sender, EventArgs e)
         {
@@ -117,9 +115,6 @@ namespace INFOIBV
                 }
             }
 
-            //grayscaleImage = fullRangeContrastImage(grayscaleImage);
-            //grayscaleImage = edgeDetection(grayscaleImage);
-
             if (BoundaryTrace.Checked)
             {
                 getBoundary(grayscaleImage);
@@ -128,13 +123,10 @@ namespace INFOIBV
             if (houghTransformCheckbox.Checked)
             {
                 float[,] acc = getHoughTransform(grayscaleImage, houghImage);
-                //houghImage = NonMaxSuppression(houghImage);
-                //houghImageOutput.Image = houghImageBitmap;
                 for (int x = 0; x < 180; x++)
                 {
                     for (int y = 0; y < 212; y++)
                     {
-                        //Debug.WriteLine(acc[x, y]);
                         houghImage[x, y] = acc[x, y];
                     }
                 }
@@ -150,8 +142,6 @@ namespace INFOIBV
                 houghImageOutput.Image = houghImageBitmap;
             }
 
-            //int[,] grayscaleValue = grayscaleImage;
-
             //truncate and return grayscale image to actual image
             for (int i = 0; i < OutputWidth; i++)
             {
@@ -164,6 +154,7 @@ namespace INFOIBV
             }
 
             // linedetection
+            int[,] lineimage = new int[InputImage.Width, InputImage.Height]; // will contain all the lines without the original picture in it. later used to detect dice.
             if (lineDetectionCheckbox.Checked)
             {
                 float[,] acc = Accumulator(grayscaleImage, int.Parse(houghThresholdVal.Text));
@@ -183,21 +174,20 @@ namespace INFOIBV
                     }
                 }
                 houghImageOutput.Image = houghImageBitmap;
-
                 for (int o = 0; o <= 180; o++)
                 {
-                    //Debug.WriteLine(o);
                     for (int r = 0; r < rmax * 2; r++)
                     {
                         if (acc[o, r] == 255)
                         {
-                            LineDetection2(ref Image, grayscaleImage,r - rmax, toRadian(o), int.Parse(minIntensityThresVal.Text), int.Parse(minLengthParVal.Text), int.Parse(maxGapParVal.Text));
+                            LineDetection(ref Image, ref lineimage ,r - rmax, toRadian(o), int.Parse(minIntensityThresVal.Text), int.Parse(minLengthParVal.Text), int.Parse(maxGapParVal.Text));
                         }
                     }
                 }
             }
 
-
+            List<Circle> possibledice = new List<Circle>();
+            int[,] circleimage = new int[InputImage.Width, InputImage.Height];// will contain only the circles that will be detected
             // circle detection
             if (circleDetection.Checked)
             {
@@ -210,12 +200,21 @@ namespace INFOIBV
                         {
                             if (accumulator[a, b, r] > 0)
                             {
-                                DrawCircle(ref Image, a, b, r);
+                                possibledice.Add(new Circle(r,a,b));
+                                DrawCircle(ref Image, ref circleimage, a, b, r, Color.FromArgb(255,0,0));
                             }
                         }
                     }
                 }
             }
+
+            // dice detection
+            List<Circle> pos2 = SearchForLine(possibledice, lineimage);
+            foreach (Circle c in pos2)
+            {
+                DrawCircle(ref Image, ref circleimage, c.a, c.b, c.r, Color.FromArgb(0,0,255));
+            }
+            SearchForCircleRow(pos2, circleimage, Image);
 
             //==========================================================================================
 
@@ -235,12 +234,7 @@ namespace INFOIBV
 
 
 
-
         // \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ --- OUR FUNCTIONS --- \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ \\
-
-
-
-        // \/\/\/\/  FUNCTION THAT ARE NOT REALLY WORKING AND NEED TO BE FIXED (FROM P3)  \/\/\/\/
 
         //Or actually display hough values in an image
         private float[,] getHoughTransform(int[,] img, float[,] houghImage)
@@ -273,72 +267,7 @@ namespace INFOIBV
         }
 
         //LineDetection Tim
-        private List<int[]> LineDetection(int[,] img, int r, int o, int minThreshold, int minLength, int maxGap)
-        {
-            List<int[]> output = new List<int[]>();
-            int[,] lines = new int[InputImage.Size.Width, InputImage.Size.Height];
-            int startx = 501, endx = -1;
-            for (int x = 0; x < InputImage.Size.Width; x++)
-            {
-                for (int y = 0; y < InputImage.Size.Height; y++)
-                {
-                    if (img[x, y] < minThreshold) continue;
-                    int i = (int)((r + Math.Cos(o) * x) / (Math.Sin(o)));
-                    if (y == i)
-                    {
-                        //Debug.WriteLine(x + " " + y);
-                        lines[x, y] = 1;
-                    }
-                }
-            }
-            for (int x = 0; x < InputImage.Size.Width; x++)
-            {
-                int j = (int)((r + Math.Cos(o) * x) / (Math.Sin(o)));
-                if (j >= InputImage.Size.Height || j < 0) continue;
-                if (lines[x, j] == 1)
-                {
-                    // going from left to right
-                    if (x < startx) startx = x;
-                    if (x > endx) endx = x;
-                }
-                if (lines[x, j] == 0)
-                {
-                    if (startx == 501)
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        int starty = (int)((r + Math.Cos(o) * startx) / (Math.Sin(o)));
-                        int endy = (int)((r + Math.Cos(o) * endx) / (Math.Sin(o)));
-                        int length = (int)Math.Sqrt(Math.Pow(endx - startx, 2) + Math.Pow(starty - endy, 2));
-                        if (length > minLength)
-                        {
-                            output.Add(new int[4] { startx, starty, endx, endy });
-                        }
-                        startx = 501;
-                        endx = -1;
-                    }
-                }
-            }
-            // check if 2 lines should be one using maxgap
-            for (int i = 0; i < output.Count() - 1; i++)
-            {
-                int[] line1 = output[i];
-                int[] line2 = output[i + 1];
-                int gap = (int)Math.Sqrt(Math.Pow(line1[2] - line2[0], 2) + Math.Pow(line2[1] - line1[3], 2));
-                if (gap < maxGap)
-                {
-                    output.Remove(line1);
-                    output.Remove(line2);
-                    output.Add(new int[] { line1[2], line1[3], line2[0], line2[1] });
-                }
-            }
-            return output;
-        }
-
-        //LineDetection Tim
-        private void LineDetection2(ref Color[,] img, int[,] gray, double r, double o, int minThreshold, int minLength, int maxGap)
+        private void LineDetection(ref Color[,] img, ref int[,] lineimage,double r, double o, int minThreshold, int minLength, int maxGap)
         {
             int[,] lines = new int[img.GetLength(0),img.GetLength(1)];
             double posX = Math.Cos(o) * r;
@@ -355,6 +284,62 @@ namespace INFOIBV
                 int y = (int)Math.Round(posY + dy * i);
                 if (x < 0 || y < 0 || x >= InputImage.Width || y >= InputImage.Height) continue;
                 img[x, y] = Color.FromArgb(0, 255, 0);
+                lineimage[x, y] = 255;
+            }
+        }
+
+        //searchforLine, deletes all circles from possibledice that don't have a line close to them.
+        private List<Circle> SearchForLine(List<Circle> circles, int[,] lines)
+        {
+            List<Circle> output = new List<Circle>();
+            foreach (Circle c in circles)
+            {
+                bool found = false;
+                for (int i = c.r; i < c.r * 3; i++)
+                {
+                    for (int o = 0; o < 360; o+=2)
+                    {
+                        int x = (int)(Math.Cos(o) * i + c.a);
+                        int y = (int)(Math.Sin(o) * i + c.b);
+                        if (x < 0 || x >= InputImage.Width || y < 0 || y >= InputImage.Height) continue;
+                        if (lines[x,y] == 255)
+                        {
+                            found = true;
+                            output.Add(c);
+                            break;
+                        }
+                    }
+                    if (found) break;
+                }
+                if (found) continue;
+            }
+            return output;
+        }
+
+        //search for circles that lay on one line (possible on a die)
+        private void SearchForCircleRow(List<Circle> circles, int[,] circleimage, Color[,] img)
+        {
+            List<Circle> output = new List<Circle>();
+            foreach (Circle c in circles)
+            {
+                for (int i = 0; i < 360; i+=2)
+                {
+                    int found = 0;
+                    for (int r = c.r + 1; r < c.r * 5; r++)
+                    {
+                        int x = (int)(c.a + Math.Cos(toRadian(i)) * r);
+                        int y = (int)(c.b + Math.Sin(toRadian(i)) * r);
+                        if (x < 0 || x >= InputImage.Width || y < 0 || y >= InputImage.Height) continue;
+                        if (circleimage[x,y] == 255)
+                        {
+                            found += 1;
+                        }
+                    }
+                    if (found > 8)
+                    {
+                        DrawLine(c, i, ref img);
+                    }
+                }
             }
         }
 
@@ -389,28 +374,41 @@ namespace INFOIBV
             return houghImage;
         }
 
-        private void DrawCircle(ref Color[,] img, int a, int b, int r)
+        private void DrawCircle(ref Color[,] img, ref int[,] circleimage,int a, int b, int r, Color color)
         {
             for (int i = 0; i < 360; i++)
             {
                 int x = (int)(Math.Cos(toRadian(i)) * r + a);
                 int y = (int)(Math.Sin(toRadian(i)) * r + b);
-                if (x < 0 || x > InputImage.Width || y < 0 || y > InputImage.Height) continue;
-                img[x, y] = Color.FromArgb(255,0,0); 
+                if (x < 0 || x >= InputImage.Width || y < 0 || y >= InputImage.Height) continue;
+                circleimage[x, y] = 255;
+                img[x, y] = color;
             }
         }
 
+        private void DrawLine(Circle c, int o,ref Color[,] img)
+        {
+            int rmax = c.r * 5;
+            for (int i = -rmax; i < rmax; i++)
+            {
+                int x = (int)(c.a + Math.Cos(toRadian(o)) * i);
+                int y = (int)(c.b + Math.Sin(toRadian(o)) * i);
+                if (x < 0 || x >= InputImage.Width || y < 0 || y >= InputImage.Height) continue;
+                img[x, y] = Color.FromArgb(0, 0, 255);
+            }
+        }
+
+        // hough circle detection
         private int[,,] CircleAccumulator(int[,] img, int threshold)
         {
             int rmin = 5; // minimum radius of a circle to be deteced
-            int rmax = 40; // maximum radius of a circle to be detected
+            int rmax = 100; // maximum radius of a circle to be detected
             int[,,] acc = new int[InputImage.Width, InputImage.Height, rmax];
             for (int x = 0; x < InputImage.Width; x++)
             {
                 for (int y = 0; y < InputImage.Height; y++)
                 {
                     if (img[x, y] < 255) continue;
-                    //Debug.WriteLine("pixel " + x + ", " + y);
                     for (int r = rmin; r < rmax; r++)
                     {
                         for (int t = 0; t < 360; t +=2)
@@ -965,6 +963,17 @@ namespace INFOIBV
                     }
                 }
             }
+        }
+    }
+
+    public class Circle
+    {
+        public int r, a, b;
+        public Circle(int r, int a, int b)
+        {
+            this.r = r;
+            this.a = a;
+            this.b = b;
         }
     }
 }
